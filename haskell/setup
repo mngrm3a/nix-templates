@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+set -e
+
+name=${1:-$(basename $PWD)}
+
+nix develop .#boot --command bash -c \
+    "stack new '$name' --bare && gen-hie --cabal > hie.yaml"
+
+sed -i '' "s/my-package/$name/" flake.nix
+sed -i '' '/^- CHANGELOG.md$/d' package.yaml && rm CHANGELOG.md
+sed -i '' '/^#.*/d' package.yaml
+
+cat >cabal.project <<EOF
+packages: .
+import: https://www.stackage.org/lts-$(sed -n -E 's/.*\/([1-9]+)\/([1-9]+)\.yaml$/\1\.\2/p' stack.yaml)/cabal.config
+EOF
+
+curl -sL \
+    "https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,haskell" \
+    > .gitignore
+
+rm setup
