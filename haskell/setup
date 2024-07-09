@@ -19,5 +19,6 @@ EOF
 curl -sL \
     "https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,haskell" \
     > .gitignore
+echo result >> .gitignore
 
 rm setup
